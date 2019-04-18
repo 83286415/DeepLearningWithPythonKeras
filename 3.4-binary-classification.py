@@ -2,7 +2,8 @@
 
 from keras.datasets import imdb
 
-(train_data, train_labels), (test_data, test_labels) = imdb.load_data(num_words=10000)
+(train_data, train_labels), (test_data, test_labels) = imdb.load_data(num_words=10000)  # the first 10000 most used word
+print(len(train_data), len(test_data))  # 25000 25000
 print(len(train_data[0]), train_data[0])  # output: 218, [1, 14, 22, ... , 178, 32]; each int means a word in English
 print(train_labels[0])  # output: 1  means positive; and 0 means negative
 
@@ -20,9 +21,10 @@ print('-------------------------------------------------------------------------
 import numpy as np
 
 def vectorize_squences(sequences, dimension=10000):
+    # 10000: 10000 columns in this array though only 218 used for train data
     results = np.zeros((len(sequences), dimension))  # zeros(x, y) makes a x row y columns matrix with all 0 elements
     for i, sequence in enumerate(sequences):
-        # print('sequence:', sequence)  # outpu: senquence: [1, 445, 32, ..., 434]
+        # print('sequence:', sequence)  # output: sequence: [1, 445, 32, ..., 434]
         results[i, sequence] = 1.  # the elements in the i's row and all columns in sequence list are 1. see e.g. below:
         '''
         results = np.zeros((3, 4))
