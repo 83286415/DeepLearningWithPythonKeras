@@ -98,7 +98,7 @@ for fname in fnames:
     dst = os.path.join(test_dogs_dir, fname)
     shutil.copyfile(src, dst)
 
-print('total training cat images:', len(os.listdir(train_cats_dir)))
+print('total training cat images:', len(os.listdir(train_cats_dir)))  # return a list of files names in the dir
 print('total training dog images:', len(os.listdir(train_dogs_dir)))
 print('total validation cat images:', len(os.listdir(validation_cats_dir)))
 print('total validation dog images:', len(os.listdir(validation_dogs_dir)))
@@ -116,4 +116,104 @@ total test dog images: 500
 print('5.2.2 done')
 print('---------------------------------------------------------------------------------------------------------------')
 
+
 # 5.2.3 building network
+
+from keras import layers
+from keras import models
+
+model = models.Sequential()
+model.add(layers.Conv2D(32, (3, 3), activation='relu',
+                        input_shape=(150, 150, 3)))  # relu: make negative values into 0
+model.add(layers.MaxPooling2D((2, 2)))  # cut the out put map shape into half
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))  # increase tunnels from 32 into 64
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(128, (3, 3), activation='relu'))  # this extra Conv2D and MaxPooling2D layers cut the map size
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Flatten())  # 3D->1D for dense layer
+model.add(layers.Dense(512, activation='relu'))  # 512 hidden units should be bigger than the Convnet kernels number 128
+model.add(layers.Dense(1, activation='sigmoid'))
+# the last layer's sigmoid make out put value from 0 to 1 in binary classification
+
+print(model.summary())  # to show the convnet's architecture
+'''
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv2d_1 (Conv2D)            (None, 148, 148, 32)      896       
+_________________________________________________________________
+max_pooling2d_1 (MaxPooling2 (None, 74, 74, 32)        0         
+_________________________________________________________________
+conv2d_2 (Conv2D)            (None, 72, 72, 64)        18496     
+_________________________________________________________________
+max_pooling2d_2 (MaxPooling2 (None, 36, 36, 64)        0         
+_________________________________________________________________
+conv2d_3 (Conv2D)            (None, 34, 34, 128)       73856     
+_________________________________________________________________
+max_pooling2d_3 (MaxPooling2 (None, 17, 17, 128)       0         
+_________________________________________________________________
+conv2d_4 (Conv2D)            (None, 15, 15, 128)       147584    
+_________________________________________________________________
+max_pooling2d_4 (MaxPooling2 (None, 7, 7, 128)         0         
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 6272)              0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 512)               3211776   
+_________________________________________________________________
+dense_2 (Dense)              (None, 1)                 513       
+=================================================================
+Total params: 3,453,121
+Trainable params: 3,453,121
+Non-trainable params: 0
+'''
+
+from keras import optimizers
+
+# add optimizer to model
+model.compile(loss='binary_crossentropy',
+              optimizer=optimizers.RMSprop(lr=1e-4),
+              metrics=['acc'])  # RMSprop(lr=1e-4): RMSprop(lr=0.0001)
+
+print('5.2.3 done')
+print('---------------------------------------------------------------------------------------------------------------')
+
+
+# 5.2.4 data pre-processing
+
+from keras.preprocessing.image import ImageDataGenerator  # used for image processing
+
+# All images will be rescaled by 1./255 (the max pixel value is 255. here its max is 1)
+train_datagen = ImageDataGenerator(rescale=1./255)
+test_datagen = ImageDataGenerator(rescale=1./255)
+
+train_generator = train_datagen.flow_from_directory(
+        # This is the target directory
+        train_dir,
+        # All images will be resized to 150x150
+        target_size=(150, 150),
+        batch_size=20,
+        # Since we use binary_crossentropy loss, we need binary labels
+        class_mode='binary')
+
+validation_generator = test_datagen.flow_from_directory(
+        validation_dir,
+        target_size=(150, 150),
+        batch_size=20,
+        class_mode='binary')
+
+# to show tha batch shape
+for data_batch, labels_batch in train_generator:
+    print('data batch shape:', data_batch.shape)  # data batch shape: (20, 150, 150, 3)
+    print('labels batch shape:', labels_batch.shape)  # labels batch shape: (20,)
+    break  # this generator will loop in train dir again and again, never stops. So need a break here.
+
+# fit generator
+history = model.fit_generator(
+      train_generator,  # generator input
+      steps_per_epoch=100,  # 20 images in a batch, here step=100 makes 100*20=2000 images stored in train dir
+      epochs=30,  # 30 epochs
+      validation_data=validation_generator,
+      validation_steps=50)  # 20 images in a batch, here step=50 makes 50*20=1000 images stored in validation dir
+model.save('cats_and_dogs_small_1.h5')  # It's good to save the model trained
