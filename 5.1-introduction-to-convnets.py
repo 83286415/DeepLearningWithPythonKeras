@@ -39,7 +39,7 @@ _________________________________________________________________
 
 model.add(layers.Flatten())  # 3D->1D
 model.add(layers.Dense(64, activation='relu'))
-model.add(layers.Dense(10, activation='softmax'))
+model.add(layers.Dense(10, activation='softmax'))  # multi-classification
 
 print(model.summary())
 '''
