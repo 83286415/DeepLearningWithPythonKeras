@@ -218,7 +218,7 @@ history = model.fit_generator(
       epochs=30,  # 30 epochs
       validation_data=validation_generator,
       validation_steps=50)  # 20 images in a batch, here step=50 makes 50*20=1000 images stored in validation dir
-model.save('cats_and_dogs_small_1.h5')  # It's good to save the model trained
+model.save('cats_and_dogs_small_1_base_save.h5')  # It's good to save the model trained
 
 # show the picture of training and validation accuracy
 
@@ -301,11 +301,11 @@ validation_generator = test_datagen.flow_from_directory(
 history = model.fit_generator(
       train_generator,
       steps_per_epoch=100,
-      epochs=50,  # change it from 100 to 50 because it costs to much time here!
+      epochs=150,  # change it from 100 to 50 because it costs to much time here!
       validation_data=validation_generator,
       validation_steps=50)
 
-model.save('cats_and_dogs_small_2.h5')
+model.save('cats_and_dogs_small_2_data_augmentation.h5')
 
 # plot
 acc = history.history['acc']

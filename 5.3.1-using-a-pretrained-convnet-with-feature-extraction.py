@@ -148,7 +148,7 @@ plt.plot(epochs, val_loss, 'b', label='Validation loss')
 plt.title('Training and validation loss')
 plt.legend()
 
-plt.show()
+# plt.show()  # commented it out for running code below
 
 print('5.3.1.1 done')
 print('---------------------------------------------------------------------------------------------------------------')
@@ -167,7 +167,20 @@ model.add(layers.Dense(1, activation='sigmoid'))
 
 print(model.summary())
 '''
-
+Layer (type)                 Output Shape              Param #   
+=================================================================
+vgg16 (Model)                (None, 4, 4, 512)         14714688  
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 8192)              0         
+_________________________________________________________________
+dense_3 (Dense)              (None, 256)               2097408   
+_________________________________________________________________
+dense_4 (Dense)              (None, 1)                 257       
+=================================================================
+Total params: 16,812,353
+Trainable params: 16,812,353
+Non-trainable params: 0
+_________________________________________________________________
 '''
 
 
@@ -220,6 +233,7 @@ history = model.fit_generator(
       validation_steps=50,
       verbose=2)
 
+model.save('cats_and_dogs_small_3_feature_extraction_with_data_augmentation.h5')
 
 # plot
 acc = history.history['acc']
@@ -242,7 +256,68 @@ plt.title('Training and validation loss_2')
 plt.legend()
 
 plt.show()
+'''it costs 8 hours to run this model fit
+Epoch 1/30
+ - 814s - loss: 0.5846 - acc: 0.7055 - val_loss: 0.4523 - val_acc: 0.8140
+Epoch 2/30
+ - 844s - loss: 0.4821 - acc: 0.7785 - val_loss: 0.3697 - val_acc: 0.8550
+Epoch 3/30
+ - 882s - loss: 0.4210 - acc: 0.8185 - val_loss: 0.3524 - val_acc: 0.8580
+Epoch 4/30
+ - 914s - loss: 0.3949 - acc: 0.8325 - val_loss: 0.3277 - val_acc: 0.8530
+Epoch 5/30
+ - 878s - loss: 0.3815 - acc: 0.8355 - val_loss: 0.2894 - val_acc: 0.8850
+Epoch 6/30
+ - 865s - loss: 0.3618 - acc: 0.8390 - val_loss: 0.2870 - val_acc: 0.8900
+Epoch 7/30
+ - 863s - loss: 0.3670 - acc: 0.8340 - val_loss: 0.2894 - val_acc: 0.8760
+Epoch 8/30
+ - 937s - loss: 0.3493 - acc: 0.8455 - val_loss: 0.2716 - val_acc: 0.8980
+Epoch 9/30
+ - 879s - loss: 0.3399 - acc: 0.8515 - val_loss: 0.2646 - val_acc: 0.8980
+Epoch 10/30
+ - 895s - loss: 0.3327 - acc: 0.8545 - val_loss: 0.2598 - val_acc: 0.8960
+Epoch 11/30
+ - 854s - loss: 0.3266 - acc: 0.8540 - val_loss: 0.2555 - val_acc: 0.9020
+Epoch 12/30
+ - 856s - loss: 0.3341 - acc: 0.8510 - val_loss: 0.2535 - val_acc: 0.8980
+Epoch 13/30
+ - 854s - loss: 0.3189 - acc: 0.8600 - val_loss: 0.2554 - val_acc: 0.8970
+Epoch 14/30
+ - 849s - loss: 0.3167 - acc: 0.8620 - val_loss: 0.2493 - val_acc: 0.9020
+Epoch 15/30
+ - 839s - loss: 0.3256 - acc: 0.8490 - val_loss: 0.2465 - val_acc: 0.9010
+Epoch 16/30
+ - 840s - loss: 0.3118 - acc: 0.8645 - val_loss: 0.2456 - val_acc: 0.9040
+Epoch 17/30
+ - 841s - loss: 0.3114 - acc: 0.8635 - val_loss: 0.2464 - val_acc: 0.9030
+Epoch 18/30
+ - 841s - loss: 0.3045 - acc: 0.8690 - val_loss: 0.2478 - val_acc: 0.9010
+Epoch 19/30
+ - 845s - loss: 0.3112 - acc: 0.8605 - val_loss: 0.2468 - val_acc: 0.8990
+Epoch 20/30
+ - 843s - loss: 0.2951 - acc: 0.8735 - val_loss: 0.2412 - val_acc: 0.9030
+Epoch 21/30
+ - 840s - loss: 0.3061 - acc: 0.8715 - val_loss: 0.2403 - val_acc: 0.9060
+Epoch 22/30
+ - 866s - loss: 0.2909 - acc: 0.8750 - val_loss: 0.2405 - val_acc: 0.9050
+Epoch 23/30
+ - 912s - loss: 0.2976 - acc: 0.8690 - val_loss: 0.2448 - val_acc: 0.9030
+Epoch 24/30
+ - 838s - loss: 0.3001 - acc: 0.8730 - val_loss: 0.2451 - val_acc: 0.8990
+Epoch 25/30
+ - 833s - loss: 0.2876 - acc: 0.8720 - val_loss: 0.2382 - val_acc: 0.9030
+Epoch 26/30
+ - 845s - loss: 0.2913 - acc: 0.8775 - val_loss: 0.2415 - val_acc: 0.9020
+Epoch 27/30
+ - 915s - loss: 0.2986 - acc: 0.8725 - val_loss: 0.2370 - val_acc: 0.9060
+Epoch 28/30
+ - 968s - loss: 0.2830 - acc: 0.8735 - val_loss: 0.2423 - val_acc: 0.9000
+Epoch 29/30
+ - 1004s - loss: 0.2853 - acc: 0.8840 - val_loss: 0.2483 - val_acc: 0.9020
+Epoch 30/30
+ - 1046s - loss: 0.2865 - acc: 0.8770 - val_loss: 0.2416 - val_acc: 0.9030
+ '''
 
-
-print('5.3.1.1 done')
+print('5.3.1.2 done')
 print('---------------------------------------------------------------------------------------------------------------')
