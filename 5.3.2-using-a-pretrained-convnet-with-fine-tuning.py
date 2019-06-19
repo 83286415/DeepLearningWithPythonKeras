@@ -1,5 +1,5 @@
 import keras
-print(keras.__version__)  # 2.2.4
+print(keras.__version__)  # 2.2.4   This code costs about 24h to run without GPU support.
 
 from keras.applications import VGG16
 
