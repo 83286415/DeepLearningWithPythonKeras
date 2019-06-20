@@ -5,7 +5,7 @@ from keras.applications import VGG16
 
 # pre-trained network
 conv_base = VGG16(weights='imagenet',
-                  include_top=False,
+                  include_top=False,  # no Dense layer included
                   input_shape=(150, 150, 3))
 
 print(conv_base.summary())
