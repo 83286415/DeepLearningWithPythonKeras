@@ -178,6 +178,8 @@ history = model.fit(input_train, y_train,
                     epochs=10,
                     batch_size=128,
                     validation_split=0.2)
+# loss: 0.0186 - acc: 0.9947 - val_loss: 0.6927 - val_acc: 0.8062 not good because review is cut for 500 words.
+
 
 # plot
 import matplotlib.pyplot as plt
