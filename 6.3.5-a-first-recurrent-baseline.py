@@ -29,6 +29,13 @@ for i, line in enumerate(lines):
     float_data[i, :] = values  # put values of climate data into float_date list without data time
 
 
+# without standardization, loss will be 4+
+mean = float_data[:200000].mean(axis=0)
+float_data -= mean
+std = float_data[:200000].std(axis=0)
+float_data /= std
+
+
 def generator(data, lookback, delay, min_index, max_index,
               shuffle=False, batch_size=128, step=6):
     if max_index is None:
@@ -104,7 +111,7 @@ from keras import layers
 from keras.optimizers import RMSprop
 
 model = Sequential()
-model.add(layers.GRU(32, input_shape=(None, float_data.shape[-1])))
+model.add(layers.GRU(32, input_shape=(None, float_data.shape[-1])))  # TODO: Why is this input_shape like this?
 model.add(layers.Dense(1))  # no activation def in last dense layer in regression problem model
 
 model.compile(optimizer=RMSprop(), loss='mae')  # loss

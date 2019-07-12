@@ -102,18 +102,24 @@ test_steps = (len(float_data) - 300001 - lookback) // batch_size
 print('prepare the climate data done')
 print('---------------------------------------------------------------------------------------------------------------')
 
-# 6.3.6 recurrent dropout against overfitting
 
-# build network model
+# 6.3.7 stacking recurrent layers
+
+# build network model with multi-GRU layers and more hidden units
+
 from keras.models import Sequential
 from keras import layers
 from keras.optimizers import RMSprop
 
 model = Sequential()
 model.add(layers.GRU(32,
-                     dropout=0.2,
-                     recurrent_dropout=0.2,
-                     input_shape=(None, float_data.shape[-1])))  # dropout  recurrent_dropout
+                     dropout=0.1,
+                     recurrent_dropout=0.5,
+                     return_sequences=True,
+                     input_shape=(None, float_data.shape[-1])))  # non-last GRU layer: return_sequences=True, return 3D
+model.add(layers.GRU(64, activation='relu',
+                     dropout=0.1,
+                     recurrent_dropout=0.5))  # 32 -> 64 more hidden units in GRU layer
 model.add(layers.Dense(1))
 
 model.compile(optimizer=RMSprop(), loss='mae')
@@ -122,6 +128,7 @@ history = model.fit_generator(train_gen,
                               epochs=40,
                               validation_data=val_gen,
                               validation_steps=val_steps)
+
 
 # plot
 import matplotlib.pyplot as plt

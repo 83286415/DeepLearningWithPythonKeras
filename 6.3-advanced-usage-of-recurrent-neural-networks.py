@@ -277,6 +277,7 @@ from keras.optimizers import RMSprop
 
 model = Sequential()
 model.add(layers.Flatten(input_shape=(lookback // step, float_data.shape[-1])))
+# Flatten: 3D->1D so the input_shape: only consider the 3D array 'samples'. Its second & third dimension as input shape
 model.add(layers.Dense(32, activation='relu'))
 model.add(layers.Dense(1))  # no activation in this last Dense layer. It's normal in regression problem. Refer to 3.6py
 
