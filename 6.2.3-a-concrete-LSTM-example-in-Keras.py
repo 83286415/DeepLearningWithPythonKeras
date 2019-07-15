@@ -42,7 +42,18 @@ history = model.fit(input_train, y_train,
                     # if para shuffle is used in fit() with validation_split. validation_split first, shuffle later.P171
 
 
-# plt
+# build network model with bio-direction RNN
+from keras import layers
+bio_direction_model = Sequential()
+bio_direction_model.add(layers.Embedding(max_features, 32))
+bio_direction_model.add(layers.Bidirectional(layers.LSTM(32)))
+bio_direction_model.add(layers.Dense(1, activation='sigmoid'))
+
+bio_direction_model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
+bio_direction_history = bio_direction_model.fit(input_train, y_train, epochs=10, batch_size=128, validation_split=0.2)
+
+
+# plot
 import matplotlib.pyplot as plt
 
 acc = history.history['acc']
@@ -62,6 +73,28 @@ plt.figure()
 plt.plot(epochs, loss, 'bo', label='Training loss')
 plt.plot(epochs, val_loss, 'b', label='Validation loss')
 plt.title('Training and validation loss')
+plt.legend()
+
+
+# plot bio_direction results
+bio_direction_acc = bio_direction_history.history['acc']
+bio_direction_val_acc = bio_direction_history.history['val_acc']
+bio_direction_loss = bio_direction_history.history['loss']
+bio_direction_val_loss = bio_direction_history.history['val_loss']
+
+bio_direction_epochs = range(len(bio_direction_acc))
+plt.figure()
+
+plt.plot(bio_direction_epochs, bio_direction_acc, 'bo', label='Training acc')
+plt.plot(bio_direction_epochs, bio_direction_val_acc, 'b', label='Validation acc')
+plt.title('BI Training and validation accuracy')
+plt.legend()
+
+plt.figure()
+
+plt.plot(bio_direction_epochs, bio_direction_loss, 'bo', label='Training loss')
+plt.plot(bio_direction_epochs, bio_direction_val_loss, 'b', label='Validation loss')
+plt.title('BI Training and validation loss')
 plt.legend()
 
 plt.show()
