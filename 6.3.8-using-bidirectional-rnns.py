@@ -112,7 +112,7 @@ from keras.optimizers import RMSprop
 
 model = Sequential()
 model.add(layers.Bidirectional(
-    layers.GRU(32), input_shape=(None, float_data.shape[-1])))  # key point
+    layers.GRU(32), input_shape=(None, float_data.shape[-1])))  # compared with 6.3.5 py
 model.add(layers.Dense(1))
 
 model.compile(optimizer=RMSprop(), loss='mae')
@@ -126,23 +126,16 @@ history = model.fit_generator(train_gen,
 # plt
 import matplotlib.pyplot as plt
 
-acc = history.history['acc']
-val_acc = history.history['val_acc']
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
-epochs = range(len(acc))
-
-plt.plot(epochs, acc, 'bo', label='Training acc')
-plt.plot(epochs, val_acc, 'b', label='Validation acc')
-plt.title('Training and validation accuracy')
-plt.legend()
+epochs = range(len(loss))
 
 plt.figure()
 
 plt.plot(epochs, loss, 'bo', label='Training loss')
 plt.plot(epochs, val_loss, 'b', label='Validation loss')
-plt.title('Training and validation loss')
+plt.title('6.3.8 Training and validation loss')
 plt.legend()
 
 plt.show()

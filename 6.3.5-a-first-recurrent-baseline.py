@@ -172,7 +172,7 @@ history = model.fit_generator(train_gen,
 # loss: 4.1808 - val_loss: 3.9868
 
 
-
+# added: reverse order model
 # build network model: with GRU layer and reverse order generator
 
 model_reverse = Sequential()
