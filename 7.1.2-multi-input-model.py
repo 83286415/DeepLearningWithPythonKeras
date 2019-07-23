@@ -5,7 +5,7 @@ from keras import Input
 
 # build network model with multi-input
 
-text_vocabulary_size = 10000  # the first 10000 words used most frequently
+text_vocabulary_size = 10000  # the first 10000 words used most frequently; 10000 as the input dim in Embedding layer.
 question_vocabulary_size = 10000  # question text input. input one
 answer_vocabulary_size = 500       # answer text input. input two
 
