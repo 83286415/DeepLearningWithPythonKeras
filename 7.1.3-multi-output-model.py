@@ -36,7 +36,7 @@ gender_prediction = layers.Dense(1, activation='sigmoid', name='gender')(x)  # b
 model = Model(posts_input, [age_prediction, income_prediction, gender_prediction])
 
 
-# Two compile styles as below:
+# Two compile styles as below: 2 is better.
 
 # 1: multi-loss functions in a list whose order is the order output layers defined above.
 model.compile(optimizer='rmsprop', loss=['mse', 'categorical_crossentropy', 'binary_crossentropy'])
@@ -47,7 +47,12 @@ model.compile(optimizer='rmsprop', loss={'age': 'mse', 'income': 'categorical_cr
 
 # 1: compile function with loss weight list. the order is the same as the order in loss function list
 model.compile(optimizer='rmsprop', loss=['mse', 'categorical_crossentropy', 'binary_crossentropy'],
-              loss_weights=[0.25, 1., 10.])
+              loss_weights=[0.25, 1., 10.])  # loss weight values refer to cloud note 7.1.3 and book P204
+
+# 2: compile function with loss weight dict. The keys are defined in output layers above
+model.compile(optimizer='rmsprop', loss={'age': 'mse', 'income': 'categorical_crossentropy',
+                                         'gender': 'binary_crossentropy'},
+              loss_weights={'age': 0.25, 'income': 1., 'gender': 10.})
 
 
 # Two fit styles as below:
@@ -55,7 +60,7 @@ model.compile(optimizer='rmsprop', loss=['mse', 'categorical_crossentropy', 'bin
 # 1: x labels in a list: order is as the order in compile function's loss list
 model.fit(posts, [age_targets, income_targets, gender_targets], epochs=10, batch_size=64)
 
-# : x labels in a dict: keys are the same as the names defined in output layers
+# 2: x labels in a dict: keys are the same as the names defined in output layers
 model.fit(posts, {'age': age_targets, 'income': income_targets, 'gender': gender_targets}, epochs=10, batch_size=64)
 
 
