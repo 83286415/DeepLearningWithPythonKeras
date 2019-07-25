@@ -2,6 +2,7 @@
 from keras.models import Model
 from keras import layers
 from keras import Input
+# from keras.utils import plot_model  # to plot the model structure
 
 
 # build network model with multi-output
@@ -34,7 +35,7 @@ gender_prediction = layers.Dense(1, activation='sigmoid', name='gender')(x)  # b
 
 # model instance: multi-output in a list
 model = Model(posts_input, [age_prediction, income_prediction, gender_prediction])
-
+# plot_model(model,show_shapes=True,to_file='model.png')
 
 # Two compile styles as below: 2 is better.
 
