@@ -6,6 +6,7 @@ from keras import models
 from keras.datasets import mnist
 from keras.utils import to_categorical
 
+
 # 5.1 py
 # Import codes from 5.1 py for data preparation and model building
 
@@ -47,15 +48,40 @@ print('data preparation and model building done')
 print('---------------------------------------------------------------------------------------------------------------')
 
 
-# 7.2.1 callbacks in training process
+# 7.2.1.3 define my own callbacks
+
+import keras
+
+
+class ActivationLogger(keras.callbacks.Callback):
+
+    def set_model(self, model):
+        self.model = model
+        layer_outputs = [layer.output for layer in model.layers]  # can read model's property
+        self.activations_model = keras.models.Model(model.input, layer_outputs)  # can make Model instance
+
+    def on_epoch_end(self, epoch, logs=None):  # other 5 defs could be recognized by fit(): refer to book P212
+        if self.validation_data is None:  # can read validation_data in fit()
+            raise RuntimeError('Requires validation_data.')
+        f = open('activations_at_epoch_' + str(epoch) + '.txt', 'w')
+        f.write('the first epoch activation saved by my own callbacks')
+        f.close()
+
+
+print('define my own callbacks done')
+print('---------------------------------------------------------------------------------------------------------------')
+
+
+# 7.2.1.1 keras callbacks in training process
 import os
 
 base_dir = 'D:/AI/deep-learning-with-python-notebooks-master'
 h5_path = os.path.join(base_dir, '7.2.1_model_checkpoint.h5')
 
-callbacks_list = [keras.callbacks.EarlyStopping(monitor='acc', patience=1,),
+callbacks_list = [keras.callbacks.EarlyStopping(monitor='val_acc', patience=1,),
                   keras.callbacks.ModelCheckpoint(filepath=h5_path, monitor='val_loss', save_best_only=True),
-                  keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=10)]
+                  keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3),  # keras callbacks
+                  ActivationLogger()]  # my own callback
 
 # import compile() and fit() from 5.1 py and add callbacks into the fit() as below
 model.compile(optimizer='rmsprop',
@@ -88,3 +114,6 @@ plt.title('Training and validation loss')
 plt.legend()
 
 plt.show()
+
+print('keras callbacks in training process done')
+print('---------------------------------------------------------------------------------------------------------------')
