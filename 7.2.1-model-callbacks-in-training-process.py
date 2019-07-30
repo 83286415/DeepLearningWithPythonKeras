@@ -78,6 +78,8 @@ import os
 base_dir = 'D:/AI/deep-learning-with-python-notebooks-master'
 h5_path = os.path.join(base_dir, '7.2.1_model_checkpoint.h5')
 
+
+# callback (list) should be defined in front of the fit()
 callbacks_list = [keras.callbacks.EarlyStopping(monitor='val_acc', patience=1,),
                   keras.callbacks.ModelCheckpoint(filepath=h5_path, monitor='val_loss', save_best_only=True),
                   keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3),  # keras callbacks
