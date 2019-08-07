@@ -55,10 +55,11 @@ from keras import layers
 
 model = keras.models.Sequential()
 model.add(layers.LSTM(128, input_shape=(maxlen, len(chars))))  # input shape is each sentence one-hot array
-model.add(layers.Dense(len(chars), activation='softmax'))
+# not only LSTM layer but also Conv1D layer could be used here instead
+model.add(layers.Dense(len(chars), activation='softmax'))  # softmax: multi-classifier
 
 optimizer = keras.optimizers.RMSprop(lr=0.01)
-model.compile(loss='categorical_crossentropy', optimizer=optimizer)
+model.compile(loss='categorical_crossentropy', optimizer=optimizer)  # the loss function is due to one-hot code
 
 
 print('build network model done')
@@ -67,13 +68,14 @@ print('-------------------------------------------------------------------------
 
 # text generation
 
-def sample(preds, temperature=1.0):
-    preds = np.asarray(preds).astype('float64')  # make it array
+# re-weighting the probability array with temperature and return the max probability's index for prediction. P230
+def sample(preds, temperature=1.0):  # preds: [p1, p2, p3, p4 ... p58] a probability list
+    preds = np.asarray(preds).astype('float64')  # make this list into a array
     preds = np.log(preds) / temperature  # log function divides temp
-    exp_preds = np.exp(preds)
+    exp_preds = np.exp(preds)  # Calculate the exponential of all elements in the input array.
     preds = exp_preds / np.sum(exp_preds)
-    probas = np.random.multinomial(1, preds, 1)
-    return np.argmax(probas)
+    probas = np.random.multinomial(1, preds, 1)  # 1: pick up 1 sample; preds: pick up from this; 1: output shape
+    return int(np.argmax(probas))  # Returns the indices of the maximum values along an axis.
 
 
 import random
@@ -91,7 +93,7 @@ for epoch in range(1, 60):  # epochs = 59
     generated_text = text[start_index: start_index + maxlen]
     print('--- Generating with seed: "' + generated_text + '"')
 
-    for temperature in [0.2, 0.5, 1.0, 1.2]:
+    for temperature in [0.2, 0.5, 1.0, 1.2]:  # higher temperature, more randomness
         print('------ temperature:', temperature)
         sys.stdout.write(generated_text)
 
@@ -101,9 +103,11 @@ for epoch in range(1, 60):  # epochs = 59
             for t, char in enumerate(generated_text):  # one-hot code the randomly picked generated_text
                 sampled[0, t, char_indices[char]] = 1.
 
-            preds = model.predict(sampled, verbose=0)[0]
-            next_index = sample(preds, temperature)
-            next_char = chars[next_index]
+            predses = model.predict(sampled, verbose=0)  # return a y label list like: [[p1, p2, p3...]]
+            preds = predses[0]                          # remove the [] outside
+
+            next_index = sample(preds, temperature)  # sample() returns the max value's index (int)
+            next_char = chars[next_index]  # next_index is a int. i change it manually
 
             generated_text += next_char
             generated_text = generated_text[1:]  # rebuild the generated text list with new added next_char predicted
