@@ -16,9 +16,9 @@ textures at different spatial scales.
 from keras.preprocessing.image import load_img, img_to_array
 
 # This is the path to the image you want to transform.
-target_image_path = 'D:/AI/deep-learning-with-python-notebooks-master/cats_and_dogs_small/temp/target.jpg'
+target_image_path = 'D:/AI/deep-learning-with-python-notebooks-master/cats_and_dogs_small/temp/tar2.jpg'
 # This is the path to the style image.
-style_reference_image_path = 'D:/AI/deep-learning-with-python-notebooks-master/cats_and_dogs_small/temp/reference.jpg'
+style_reference_image_path = 'D:/AI/deep-learning-with-python-notebooks-master/cats_and_dogs_small/temp/ref4.jpg'
 
 # Dimensions of the generated picture.
 width, height = load_img(target_image_path).size
@@ -32,33 +32,33 @@ from keras.applications import vgg19
 def preprocess_image(image_path):
     img = load_img(image_path, target_size=(img_height, img_width))
     img = img_to_array(img)
-    img = np.expand_dims(img, axis=0)
-    img = vgg19.preprocess_input(img)
+    img = np.expand_dims(img, axis=0)  # add 0th dimension for vgg preprocess input
+    img = vgg19.preprocess_input(img)  # remove pixel mean value and RGB format -> BGR format
     return img
 
 def deprocess_image(x):
-    # Remove zero-center by mean pixel
+    # The inverse operation of vgg19.preprocess_input
     x[:, :, 0] += 103.939
     x[:, :, 1] += 116.779
     x[:, :, 2] += 123.68
-    # 'BGR'->'RGB'
-    x = x[:, :, ::-1]
-    x = np.clip(x, 0, 255).astype('uint8')
+    x = x[:, :, ::-1]   # 'BGR'->'RGB'
+
+    x = np.clip(x, 0, 255).astype('uint8')  # limit the values of x in (0, 255)
     return x
 
 
 from keras import backend as K
 
-target_image = K.constant(preprocess_image(target_image_path))
+target_image = K.constant(preprocess_image(target_image_path))  # constant: target array cannot be changed
 style_reference_image = K.constant(preprocess_image(style_reference_image_path))
 
 # This placeholder will contain our generated image
-combination_image = K.placeholder((1, img_height, img_width, 3))
+combination_image = K.placeholder((1, img_height, img_width, 3))  # a placeholder instance without actual data in# 3 RGB
 
 # We combine the 3 images into a single batch
 input_tensor = K.concatenate([target_image,
                               style_reference_image,
-                              combination_image], axis=0)
+                              combination_image], axis=0)  # combine 3 tensor into 1 tensor
 
 # We build the VGG19 network with our batch of 3 images as input.
 # The model will be loaded with pre-trained ImageNet weights.
@@ -69,12 +69,12 @@ print('Model loaded.')
 
 
 def content_loss(base, combination):
-    return K.sum(K.square(combination - base))
+    return K.sum(K.square(combination - base))  # square: x*x
 
 
-def gram_matrix(x):
-    features = K.batch_flatten(K.permute_dimensions(x, (2, 0, 1)))
-    gram = K.dot(features, K.transpose(features))
+def gram_matrix(x):   # batch flatten: nD array -> 2D array (all samples are make together into one 2D array)
+    features = K.batch_flatten(K.permute_dimensions(x, (2, 0, 1)))  # permute dimensions: (a, b, c) -> (c, a, b)
+    gram = K.dot(features, K.transpose(features))  # transpose: matrix T transpose
     return gram
 
 
@@ -91,7 +91,7 @@ def total_variation_loss(x):
         x[:, :img_height - 1, :img_width - 1, :] - x[:, 1:, :img_width - 1, :])
     b = K.square(
         x[:, :img_height - 1, :img_width - 1, :] - x[:, :img_height - 1, 1:, :])
-    return K.sum(K.pow(a + b, 1.25))
+    return K.sum(K.pow(a + b, 1.25))  # pow: (a+b)**1.25
 
 
 # Dict mapping layer names to activation tensors
@@ -109,8 +109,8 @@ total_variation_weight = 1e-4
 style_weight = 1.
 content_weight = 0.025
 
-# Define the loss by adding all components to a `loss` variable
-loss = K.variable(0.)
+
+loss = K.variable(0.)  # Define the loss by adding all components to a `loss` variable
 layer_features = outputs_dict[content_layer]
 target_image_features = layer_features[0, :, :, :]
 combination_features = layer_features[2, :, :, :]
@@ -122,7 +122,7 @@ for layer_name in style_layers:
     combination_features = layer_features[2, :, :, :]
     sl = style_loss(style_reference_features, combination_features)
     loss += (style_weight / len(style_layers)) * sl
-loss += total_variation_weight * total_variation_loss(combination_image)
+loss += total_variation_weight * total_variation_loss(combination_image)  # calculate total loss
 
 
 # Get the gradients of the generated image wrt the loss
@@ -133,6 +133,7 @@ fetch_loss_and_grads = K.function([combination_image], [loss, grads])
 
 
 class Evaluator(object):
+    # this class compute loss and grads at the same time: save time
 
     def __init__(self):
         self.loss_value = None
@@ -175,7 +176,7 @@ for i in range(iterations):
     print('Start of iteration', i)
     start_time = time.time()
     x, min_val, info = fmin_l_bfgs_b(evaluator.loss, x,
-                                     fprime=evaluator.grads, maxfun=20)
+                                     fprime=evaluator.grads, maxfun=20)  # loss and grads must be individual flatten ar
     print('Current loss value:', min_val)
     # Save current generated image
     img = x.copy().reshape((img_height, img_width, 3))
