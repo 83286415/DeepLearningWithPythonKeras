@@ -136,13 +136,14 @@ figure = np.zeros((digit_size * n, digit_size * n))
 # through the inverse CDF (ppf) of the Gaussian
 # to produce values of the latent variables z,
 # since the prior of the latent space is Gaussian
-grid_x = norm.ppf(np.linspace(0.05, 0.95, n))
+grid_x = norm.ppf(np.linspace(0.05, 0.95, n))  # linspace(start, stop, number)
 grid_y = norm.ppf(np.linspace(0.05, 0.95, n))
+# norm.ppf(y), y is a probability. return the x value of the y value in a normal distribution
 
 for i, yi in enumerate(grid_x):
     for j, xi in enumerate(grid_y):
         z_sample = np.array([[xi, yi]])
-        z_sample = np.tile(z_sample, batch_size).reshape(batch_size, 2)
+        z_sample = np.tile(z_sample, batch_size).reshape(batch_size, 2)  # tile: return z*batch array
         x_decoded = decoder.predict(z_sample, batch_size=batch_size)
         digit = x_decoded[0].reshape(digit_size, digit_size)
         figure[i * digit_size: (i + 1) * digit_size,
